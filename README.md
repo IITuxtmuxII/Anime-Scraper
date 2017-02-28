@@ -2,9 +2,9 @@ NyaaMagnet
 ==========
 
 Scrape [nyaa](http://nyaa.se) and [sukebei](http://sukebei.nyaa.se).
-- Indexes: torrent_id, torrent_name, torrent_hash, category_id, sub_category_id, status_id.
-- Incrementally index each torrent page, saving it to sqlite database file titled either `nyaa.sqlite` or `sukebei.sqlite`.
-- [nyaa](http://nyaa.se) has over 903,600 torrent pages, [sukebei](http://sukebei.nyaa.se) has over 2,256,000 torrent pages. A preindexed database is planned to be included for each of these.
+- Incrementally indexes: torrent_id, torrent_name, torrent_hash, category_id, sub_category_id, status_id.
+- Saves data to sqlite database.
+- As both ([nyaa](http://nyaa.se) 903,600 pages) and ([sukebei](http://sukebei.nyaa.se) 2,256,000 pages) have many pages to index, provided database files are *planned to be* included.
 
 # REQUIREMENTS
 - [Python 3](https://www.python.org/download/releases/3.0/)
