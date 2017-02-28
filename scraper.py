@@ -82,19 +82,19 @@ for i in range(config.start_entry, nt.last_entry + 1):
     if entry.exists is True:
         if entry.category in db.categories and entry.sub_category in db.sub_categories:
             entryname = str(entry.name).rstrip().lstrip()
-            if entry.hash is None:
+            if entry.magnet is None:
                 print('Torrent magnet failed ID:',i)
                 continue
             if config.mode == 'new' and not db.entry_exists(i):
                 print('Insert: {}, Name: {}'.format(i, entryname))
                 db.write_torrent((
-                    i, entry.name, entry.hash, db.categories[entry.category],
+                    i, entry.name, entry.magnet, db.categories[entry.category],
                     db.sub_categories[entry.sub_category], db.status[entry.status]
                 ))
             else: # update
                 print('Update: {}, Name: {}'.format(i, entryname))
                 db.update_torrent((
-                    i, entry.name, entry.hash, db.categories[entry.category],
+                    i, entry.name, entry.magnet, db.categories[entry.category],
                     db.sub_categories[entry.sub_category], db.status[entry.status]
                 ))
         else:

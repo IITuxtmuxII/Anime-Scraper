@@ -114,7 +114,7 @@ class NyaaEntry(object):
             return 'normal'
 
     @property
-    def hash(self):
+    def magnet(self):
         try:
             r = _retry_on_fail(requests.head, self.download_url)
             return r

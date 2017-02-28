@@ -41,7 +41,7 @@ class Database(object):
             status_name TEXT NOT NULL, PRIMARY KEY (status_id))')
         self.c.execute('CREATE TABLE torrents \
             (torrent_id INTEGER NOT NULL, torrent_name TEXT NOT NULL, \
-            torrent_hash TEXT NOT NULL, category_id INTEGER NOT NULL, \
+            torrent_magnet TEXT NOT NULL, category_id INTEGER NOT NULL, \
             sub_category_id INTEGER NOT NULL, status_id INTEGER NOT NULL, \
             PRIMARY KEY (torrent_id), \
             FOREIGN KEY (category_id) REFERENCES categories(category_id), \
@@ -162,7 +162,7 @@ class Database(object):
         comparison = [
             (0, 'torrent_id', 'INTEGER', 1, None, 1),
             (1, 'torrent_name', 'TEXT', 1, None, 0),
-            (2, 'torrent_hash', 'TEXT', 1, None, 0),
+            (2, 'torrent_magnet', 'TEXT', 1, None, 0),
             (3, 'category_id', 'INTEGER', 1, None, 0),
             (4, 'sub_category_id', 'INTEGER', 1, None, 0),
             (5, 'status_id', 'INTEGER', 1, None, 0)
@@ -190,11 +190,11 @@ class Database(object):
         self.c.commit()
 
     def write_torrent(self, data):
-        ''''torrent_id, torrent_name, torrent_hash, category_id, sub_category_id, status_id'''
+        ''''torrent_id, torrent_name, torrent_magnet, category_id, sub_category_id, status_id'''
         self.c.execute('INSERT INTO torrents VALUES (?, ?, ?, ?, ?, ?)', data)
         self.c.commit()
 
     def update_torrent(self, data):
-        '''torrent_id, torrent_name, torrent_hash, category_id, sub_category_id, status_id'''
-        self.c.execute('UPDATE torrents SET torrent_name="'+str(data[1])+'",torrent_hash="'+str(data[1])+'",torrent_hash="'+str(data[1])+'",category_id="'+str(data[3])+'",sub_category_id="'+str(data[4])+'",status_id="'+str(data[5])+'" WHERE torrent_id='+str(data[0]))
+        '''torrent_id, torrent_name, torrent_magnet, category_id, sub_category_id, status_id'''
+        self.c.execute('UPDATE torrents SET torrent_name="'+str(data[1])+'",torrent_magnet="'+str(data[1])+'",torrent_magnet="'+str(data[1])+'",category_id="'+str(data[3])+'",sub_category_id="'+str(data[4])+'",status_id="'+str(data[5])+'" WHERE torrent_id='+str(data[0]))
         self.c.commit()
