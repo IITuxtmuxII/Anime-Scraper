@@ -2,7 +2,7 @@ NyaaMagnet
 ==========
 
 Scrape [nyaa](http://nyaa.se) and [sukebei](http://sukebei.nyaa.se).
-- Index the id, category, subcategory, title and magnet.
+- Indexes: torrent_id, torrent_name, torrent_hash, category_id, sub_category_id, status_id.
 - Incrementally index each torrent page, saving it to sqlite database file titled either `nyaa.sqlite` or `sukebei.sqlite`.
 - [nyaa](http://nyaa.se) has over 903,600 torrent pages, [sukebei](http://sukebei.nyaa.se) has over 2,256,000 torrent pages. A preindexed database is planned to be included for each of these.
 
