@@ -1,0 +1,4 @@
+*.torrent
+__pycache__/
+nyaa.sqlite
+sukebei.sqlite
