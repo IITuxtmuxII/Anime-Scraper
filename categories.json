@@ -1,0 +1,46 @@
+{
+    "Nyaa": {
+        "Anime": [
+            "English-translated",
+            "Non-English-translated",
+            "Anime Music Video",
+            "Raw"
+        ],
+        "Audio": [
+            "Lossless",
+            "Lossy"
+        ],
+        "Literature": [
+            "English-translated",
+            "Non-English-translated",
+            "Raw"
+        ],
+        "Live Action": [
+            "English-translated",
+            "Non-English-translated",
+            "Idol/Promotional Video",
+            "Raw"
+        ],
+        "Software": [
+            "Applications",
+            "Games"
+        ],
+        "Pictures": [
+            "Photos",
+            "Graphics"
+        ]
+    },
+    "Sukebei": {
+        "Art": [
+            "Anime",
+            "Manga",
+            "Games",
+            "Pictures",
+            "Doujinshi"
+        ],
+        "Real Life": [
+            "Videos",
+            "Photobooks & Pictures"
+        ]
+    }
+}
