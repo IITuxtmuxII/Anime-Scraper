@@ -42,5 +42,34 @@
             "Videos",
             "Photobooks & Pictures"
         ]
+    },
+    "Bakabt": {
+        "Anime Series": [
+            "Default"
+        ],
+        "Anime Movie": [
+            "Default"
+        ],
+        "OVA": [
+            "Default"
+        ],
+        "Live Action": [
+            "Default"
+        ],
+        "Music Video": [
+            "Default"
+        ],
+        "Soundtrack": [
+            "Default"
+        ],
+        "Artbook": [
+            "Default"
+        ],
+        "Light Novel": [
+            "Default"
+        ],
+        "Manga": [
+            "Default"
+        ]
     }
 }
