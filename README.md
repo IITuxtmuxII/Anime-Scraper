@@ -10,7 +10,7 @@ Scrape [nyaa](http://nyaa.se), [sukebei](http://sukebei.nyaa.se), and [bakabt](h
 
 # USAGE
 - `Scraper.py nyaa|sukebei|bakabt new|missed|update`
-- Example: `Scraper.py nyaa`
+- `Scraper.py nyaa`
 
 The `new` mode starts from the last retrieved id in the database.<br>
 The `missed` mode rechecks for missed id not in the database.<br>
