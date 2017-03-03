@@ -23,7 +23,7 @@ class Database(object):
         elif "bakabt" in self.filename:
             if not self.file_exists:
                 self.baka_create_database()
-            #self.baka_verify_database() # TODO
+            #self.baka_verify_database()
             self.check_categories()
             self.check_status()
             self.load_values()
@@ -59,6 +59,7 @@ class Database(object):
             FOREIGN KEY (status_id) REFERENCES status(status_id))')
 
     def baka_create_database(self):
+        '''torrent_id, torrent_url, torrent_name, torrent_resolution, torrent_tags, torrent_sb, torrent_cb, torrent_added, torrent_size, torrent_sld, category_id, sub_category_id, status_id'''
         print('Creating database...')
         self.c.execute('CREATE TABLE categories (category_id INTEGER NOT NULL, \
             category_name TEXT NOT NULL, PRIMARY KEY (category_id))')
@@ -69,9 +70,12 @@ class Database(object):
         self.c.execute('CREATE TABLE status (status_id INTEGER NOT NULL, \
             status_name TEXT NOT NULL, PRIMARY KEY (status_id))')
         self.c.execute('CREATE TABLE torrents \
-            (torrent_id INTEGER NOT NULL, torrent_name VARCHAR NOT NULL, \
-            torrent_info VARCHAR NOT NULL, torrent_sld VARCHAR NOT NULL, \
-            torrent_magnet VARCHAR NOT NULL, category_id INTEGER NOT NULL, \
+            (torrent_id INTEGER NOT NULL, torrent_url VARCHAR NOT NULL, \
+            torrent_name VARCHAR, torrent_resolution VARCHAR, \
+            torrent_tags VARCHAR, torrent_sb VARCHAR, \
+            torrent_cb VARCHAR NOT NULL, torrent_added VARCHAR NOT NULL, \
+            torrent_size VARCHAR NOT NULL, torrent_sld VARCHAR NOT NULL, \
+            torrent_file BLOB NOT NULL, category_id INTEGER NOT NULL, \
             sub_category_id INTEGER NOT NULL, status_id INTEGER NOT NULL, \
             PRIMARY KEY (torrent_id), \
             FOREIGN KEY (category_id) REFERENCES categories(category_id), \
@@ -169,8 +173,7 @@ class Database(object):
         if cur.fetchall() == comparison:
             print('Table \'categories\' verified.')
         else:
-            print('Table \'categories\' broken.')
-            exit()
+            exit('Table \'categories\' broken.')
 
         comparison = [
             (0, 'sub_category_id', 'INTEGER', 1, None, 1),
@@ -180,8 +183,7 @@ class Database(object):
         if cur.fetchall() == comparison:
             print('Table \'sub_categories\' verified.')
         else:
-            print('Table \'sub_categories\' broken.')
-            exit()
+            exit('Table \'sub_categories\' broken.')
 
         comparison = [
             (0, 'status_id', 'INTEGER', 1, None, 1),
@@ -191,8 +193,7 @@ class Database(object):
         if cur.fetchall() == comparison:
             print('Table \'status\' verified.')
         else:
-            print('Table \'status\' broken.')
-            exit()
+            exit('Table \'status\' broken.')
 
         comparison = [
             (0, 'torrent_id', 'INTEGER', 1, None, 1),
@@ -236,6 +237,11 @@ class Database(object):
         self.c.commit()
 
     def baka_write_torrent(self, data):
+        '''torrent_id, torrent_file torrent_url, torrent_name, torrent_resolution, torrent_tags, torrent_sb, torrent_cb, torrent_added, torrent_size, torrent_sld, category_id, sub_category_id, status_id'''
+        self.c.execute('INSERT INTO torrents VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
+        self.c.commit()
+
+    def baka_update_torrent(self, data):
         '''torrent_id, torrent_name, torrent_info, torrent_sld, torrent_magnet, category_id, sub_category_id, status_id'''
-        self.c.execute('INSERT INTO torrents VALUES (?, ?, ?, ?, ?, ?, ?, ?)', data)
+        self.c.execute('UPDATE torrents SET torrent_id=(?),torrent_url=(?),torrent_name=(?),torrent_resolution=(?),torrent_tags=(?),torrent_sb=(?),torrent_cb=(?),torrent_added=(?),torrent_size=(?),torrent_sld=(?),torrent_file=(?),category_id=(?),sub_category_id=(?),status_id=(?) WHERE torrent_id='+str(data[0]), data)
         self.c.commit()

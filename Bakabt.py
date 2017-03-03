@@ -10,11 +10,13 @@ from urllib.parse import urlparse
 class Baka(object):
     def __init__(self, url, page):
         self.url = str(url)
-        self.pagen = str(page)
+        self.pagen = str(page-1)
 
     def baka_list(self):
         page_index = {}
         page = self.url + "browse.php?page=" + self.pagen
+        self.last_category=""
+        print("> Index",page)
         r = retry_on_fail(requests.get, page)
         setattr(r, 'encoding', 'utf-8')
         self.page = BeautifulSoup(r.text, "lxml")
@@ -22,8 +24,10 @@ class Baka(object):
         for tds in table:
             tdx=0
             for td in tds.find_all("td"):
+                append=False
                 tdx+=1
                 if len(tds)==5:
+                    append=True
                     if tdx==1:
                         self.td1=td
                     if tdx==2:
@@ -34,22 +38,35 @@ class Baka(object):
                         self.td4=td
                     elif tdx==5:
                         self.td5=td
-
+                elif len(tds)==4 and "Alternative versions" not in tds.text:
+                    append=True
+                    if tdx==1:
+                        self.td2=td
+                    if tdx==2:
+                        self.td3=td
+                    elif tdx==3:
+                        self.td4=td
+                    elif tdx==4:
+                        self.td5=td
+                if append==True:
+                    if len(tds)==5 and tdx==5 or len(tds)==4 and tdx==4:
                         baka_id=self.baka_url_id
                         page_index[baka_id] = {}
+                        page_index[baka_id]["baka_url_id"] = self.baka_url_id
                         page_index[baka_id]["baka_url"] = self.baka_url
-                        page_index[baka_id]["category"] = self.category
+                        if len(tds)==5:
+                            page_index[baka_id]["category"] = self.category
+                        elif len(tds)==4:
+                            page_index[baka_id]["category"] = self.last_category
                         page_index[baka_id]["title_orig"] = self.title_orig
                         page_index[baka_id]["title"] = self.title
                         page_index[baka_id]["resolution"] = self.resolution
-                        page_index[baka_id]["sb"] = self.sb
-                        page_index[baka_id]["cb"] = self.cb
-                        page_index[baka_id]["tags"] = self.tags
+                        page_index[baka_id]["sb"] = str(self.sb)
+                        page_index[baka_id]["cb"] = str(self.cb)
+                        page_index[baka_id]["tags"] = str(self.tags)
                         page_index[baka_id]["added"] = self.added
                         page_index[baka_id]["size"] = self.size
-                        page_index[baka_id]["downloads"] = self.downloads
-                        page_index[baka_id]["seeders"] = self.seeders
-                        page_index[baka_id]["leechers"] = self.leechers
+                        page_index[baka_id]["sld"] = str(self.sld)
         return page_index
 
     @property
@@ -82,6 +99,7 @@ class Baka(object):
         try:
             for dic, tem in {"series":"Anime Series","movie":"Anime Movie","ova":"OVA","ost":"Soundtrack","liveaction":"Live Action","musicvideo":"Music Video","lightnovel":"Light Novel","artbook":"Artbook","manga":"Manga"}.items():
                 if tem in str(self.td1):
+                    self.last_category=tem
                     return tem
             return None
         except AttributeError as e:
@@ -96,27 +114,22 @@ class Baka(object):
                 return self.td2.find('a', class_='title').text
             return None
         except AttributeError as e:
-            if "NoneType" not in str(e):
+            if self.td2.find('a', class_='alt_title').text:
+                return self.td2.find('a', class_='alt_title').text
+            elif "NoneType" not in str(e):
                 print(e)
-            return None
+        return None
 
     @property
     def title(self):
         try:
-            title=re.sub(r"[\(\[].*?[\)\]]", "", self.title_orig).rstrip().lstrip() # remove (), []
-            if title.count('|') > 0:
-                title_list=[]
-                title_list.append(title.split('|')[0].lstrip().rstrip())
-                title_list.append(title.split('|')[1].lstrip().rstrip()) # english
-                if title.count('|') == 2:
-                    title_list.append(title.split('|')[2].lstrip().rstrip()) # synonym
-                return title_list
-            else:
-                return title
+            return re.sub(r"[\(\[].*?[\)\]]", "", self.title_orig).rstrip().lstrip() # remove (), []
         except AttributeError as e:
             if "NoneType" not in str(e):
                 print(e)
             return None
+        except TypeError:
+            exit("title error")
 
     @property
     def resolution(self):
@@ -124,6 +137,7 @@ class Baka(object):
             for tem in ["1080p","960p","720p","480p","360p","240p"]:
                 if tem in self.title_orig:
                     return tem
+            return None
         except AttributeError as e:
             print(e)
         except TypeError as e:
@@ -189,48 +203,10 @@ class Baka(object):
         return None
 
     @property
-    def dsl(self):
-        try:
+    def sld(self):
             if self.td5.text:
-                return self.td5.text
-            return None
-        except AttributeError as e:
-            if "NoneType" not in str(e):
-                print(e)
-        return None
-
-    @property
-    def downloads(self):
-        try:
-            if self.dsl.split('/')[0]:
-                return self.dsl.split('/')[0]
-            return None
-        except AttributeError as e:
-            if "NoneType" not in str(e):
-                print(e)
-        return None
-
-    @property
-    def seeders(self):
-        try:
-            if self.dsl.split('/')[1]:
-                return self.dsl.split('/')[1]
-            return None
-        except AttributeError as e:
-            if "NoneType" not in str(e):
-                print(e)
-        return None
-
-    @property
-    def leechers(self):
-        try:
-            if self.dsl.split('/')[2]:
-                return self.dsl.split('/')[2]
-            return None
-        except AttributeError as e:
-            if "NoneType" not in str(e):
-                print(e)
-        return None
+                sld = self.td5.text
+                return sld.split('/')[1], sld.split('/')[2], sld.split('/')[0]
 
     def last_entry(url):
         baka_url=url+"browse.php"
@@ -255,7 +231,7 @@ class BakaEntry(object):
         setattr(r, 'encoding', 'utf-8')
         self.page = BeautifulSoup(r.text, "lxml")
 
-    def quality(self):
+    def status(self):
         content = self.page.find('div', class_='content').text
         if 'Bad input' in content:
             self.exists = False
@@ -263,19 +239,20 @@ class BakaEntry(object):
             if self.sub_category:
                 return self.sub_category
             else:
-                return None
+                return "normal"
 
     @property
     def sub_category(self):
         try:
             for list_item in self.page.find("div", class_='other-versions').find("ul").find_all("li"):
-                for dic, tem in {"A":"A","B":"B","C":"C","D":"D"}.items():
+                for tem in ["A","B","C","D"]:
                     if self.title in list_item.text:
                         #print("found",self.title)
                         if tem == list_item.find("span", class_="quality").text:
                             return tem
                         elif list_item.find("span", class_="quality").text == "": # unmoderated
-                            return None
+                            return "normal"
+                return "normal"
         except AttributeError as e:
             if "NoneType" not in str(e):
                 print(e)
@@ -290,19 +267,12 @@ class BakaEntry(object):
                 parsed_uri = urlparse(self.baka_url)
                 domain = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
                 self.full_baka = domain + link['href']
-                self.get_torrent()
+                r = retry_on_fail(requests.get, self.full_baka)
+                if r.content:
+                    torrent = r.content
+                    return torrent
             elif "#" == link['href']:
                 return None
             else:
                 print("no link")
         return None
-
-    @property
-    def get_torrent(self):
-        print(self.full_baka)
-        r = retry_on_fail(requests.get, self.full_baka)
-        if r.content:
-            return r.content
-        else:
-            print("error torrent")
-            return None

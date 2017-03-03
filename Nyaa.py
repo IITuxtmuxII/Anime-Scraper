@@ -75,14 +75,8 @@ class NyaaEntry(object):
     def sld(self):
         viewtable=self.page.find('table', class_='viewtable')
         seeders=viewtable.find('span', class_='viewsn').text
-        if not int(seeders):
-            seeders=0
         leechers=viewtable.find('span', class_='viewln').text
-        if not int(leechers):
-            leechers=0
         downloads=viewtable.find('span', class_='viewdn').text
-        if not int(downloads):
-            downloads=0
         return seeders, leechers, downloads
 
     @property
