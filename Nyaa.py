@@ -2,8 +2,6 @@ from bs4 import BeautifulSoup
 from Retrieve import retry_on_fail
 import re
 import requests
-import sys
-import time
 import urllib.request
 
 class Nyaa(object):
@@ -15,9 +13,8 @@ class Nyaa(object):
     @property
     def last_entry(self):
         r=retry_on_fail(requests.get, self.url)
-        soup=BeautifulSoup(r.text, "lxml")
-        link=soup.find('tr', class_='tlistrow') \
-                   .find('td', class_='tlistname').a['href']
+        soup=BeautifulSoup(r.text, 'lxml')
+        link=soup.find('tr', class_='tlistrow').find('td', class_='tlistname').a['href']
         return int(re.search('tid=([0-9]*)', link).group(1))
 
 
@@ -29,31 +26,32 @@ class NyaaEntry(object):
 
         r=retry_on_fail(requests.get, self.info_url)
         setattr(r, 'encoding', 'utf-8')
-        self.page=BeautifulSoup(r.text, "lxml")
+        self.page=BeautifulSoup(r.text, 'lxml')
         content=self.page.find('div', class_='content').text
         if 'The torrent you are looking for does not appear to be in the database' in content:
             #print('{}{} not exist...'.format(nyaa.info_url, nyaa_id))
             self.exists=False
         elif 'The torrent you are looking for has been deleted' in content:
+            print(2)
             self.exists=False
         else:
             self.exists=True
 
     @property
     def category(self):
-        return (self.page.find('td', class_='viewcategory').find_all('a')[0].text)
+        return self.page.find('td', class_='viewcategory').find_all('a')[0].text
 
     @property
     def sub_category(self):
-        return (self.page.find('td', class_='viewcategory').find_all('a')[1].text)
+        return self.page.find('td', class_='viewcategory').find_all('a')[1].text
 
     @property
     def name(self):
-        return(self.page.find('td', class_='viewtorrentname').text)
+        return self.page.find('td', class_='viewtorrentname').text
 
     @property
     def time(self):
-        return(self.page.find('td', class_='vtop').text.split(', '))
+        return self.page.find('td', class_='vtop').text.split(', ')
 
     @property
     def status(self):
@@ -83,8 +81,8 @@ class NyaaEntry(object):
     def magnet(self):
         try:
             r=retry_on_fail(requests.head, self.download_url)
-            if "magnet" not in str(r):
-                print("Aliased torrent, skipping...")
+            if 'magnet' not in r:
+                print('Aliased torrent, skipping...')
                 return None
             return r
         except:

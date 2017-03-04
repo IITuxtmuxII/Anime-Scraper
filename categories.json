@@ -71,5 +71,13 @@
         "Manga": [
             "Default"
         ]
+    },
+    "MyAnimeList": {
+        "Anime": [
+            "TV",
+            "OVA",
+            "Special",
+            "Movie"
+        ]
     }
 }

@@ -1,10 +1,10 @@
 import json
+import sys
 import os
 import sqlite3
 
 
 class Database(object):
-    """docstring for Database"""
     def __init__(self, path, filename):
         self.path = path
         self.filename = filename + '.sqlite'
@@ -13,20 +13,19 @@ class Database(object):
         else:
             self.file_exists = False
         self.c = sqlite3.connect(self.path + '/' + self.filename)
-        if "nyaa" in self.filename or "sukebei" in self.filename:
+        if self.filename=='nyaa.sqlite' or self.filename=='sukebei.sqlite':
             if not self.file_exists:
                 self.nyaa_create_database()
             self.nyaa_verify_database()
-            self.check_categories()
-            self.check_status()
-            self.load_values()
-        elif "bakabt" in self.filename:
+        elif self.filename=='bakabt.sqlite':
             if not self.file_exists:
                 self.baka_create_database()
-            #self.baka_verify_database()
-            self.check_categories()
-            self.check_status()
-            self.load_values()
+        elif self.filename=='myanimelist.sqlite':
+            if not self.file_exists:
+                self.myanimelist_create_database()
+        self.check_categories()
+        self.check_status()
+        self.load_values()
 
     @property
     def last_entry(self):
@@ -39,14 +38,9 @@ class Database(object):
 
     def nyaa_create_database(self):
         print('Creating database...')
-        self.c.execute('CREATE TABLE categories (category_id INTEGER NOT NULL, \
-            category_name TEXT NOT NULL, PRIMARY KEY (category_id))')
-        self.c.execute(
-            'CREATE TABLE sub_categories (sub_category_id INTEGER NOT NULL, \
-            sub_category_name TEXT NOT NULL, PRIMARY KEY (sub_category_id))'
-        )
-        self.c.execute('CREATE TABLE status (status_id INTEGER NOT NULL, \
-            status_name TEXT NOT NULL, PRIMARY KEY (status_id))')
+        self.c.execute('CREATE TABLE categories (category_id INTEGER NOT NULL, category_name TEXT NOT NULL, PRIMARY KEY (category_id))')
+        self.c.execute('CREATE TABLE sub_categories (sub_category_id INTEGER NOT NULL, sub_category_name TEXT NOT NULL, PRIMARY KEY (sub_category_id))')
+        self.c.execute('CREATE TABLE status (status_id INTEGER NOT NULL, status_name TEXT NOT NULL, PRIMARY KEY (status_id))')
         self.c.execute('CREATE TABLE torrents \
             (torrent_id INTEGER NOT NULL, torrent_name VARCHAR NOT NULL, \
             torrent_info VARCHAR NOT NULL, torrent_sld VARCHAR NOT NULL, \
@@ -54,21 +48,14 @@ class Database(object):
             sub_category_id INTEGER NOT NULL, status_id INTEGER NOT NULL, \
             PRIMARY KEY (torrent_id), \
             FOREIGN KEY (category_id) REFERENCES categories(category_id), \
-            FOREIGN KEY (sub_category_id) \
-                REFERENCES sub_categories(sub_category_id), \
+            FOREIGN KEY (sub_category_id) REFERENCES sub_categories(sub_category_id), \
             FOREIGN KEY (status_id) REFERENCES status(status_id))')
 
     def baka_create_database(self):
-        '''torrent_id, torrent_url, torrent_name, torrent_resolution, torrent_tags, torrent_sb, torrent_cb, torrent_added, torrent_size, torrent_sld, category_id, sub_category_id, status_id'''
         print('Creating database...')
-        self.c.execute('CREATE TABLE categories (category_id INTEGER NOT NULL, \
-            category_name TEXT NOT NULL, PRIMARY KEY (category_id))')
-        self.c.execute(
-            'CREATE TABLE sub_categories (sub_category_id INTEGER NOT NULL, \
-            sub_category_name TEXT NOT NULL, PRIMARY KEY (sub_category_id))'
-        )
-        self.c.execute('CREATE TABLE status (status_id INTEGER NOT NULL, \
-            status_name TEXT NOT NULL, PRIMARY KEY (status_id))')
+        self.c.execute('CREATE TABLE categories (category_id INTEGER NOT NULL, category_name TEXT NOT NULL, PRIMARY KEY (category_id))')
+        self.c.execute('CREATE TABLE sub_categories (sub_category_id INTEGER NOT NULL, sub_category_name TEXT NOT NULL, PRIMARY KEY (sub_category_id))')
+        self.c.execute('CREATE TABLE status (status_id INTEGER NOT NULL, status_name TEXT NOT NULL, PRIMARY KEY (status_id))')
         self.c.execute('CREATE TABLE torrents \
             (torrent_id INTEGER NOT NULL, torrent_url VARCHAR NOT NULL, \
             torrent_name VARCHAR, torrent_resolution VARCHAR, \
@@ -79,9 +66,32 @@ class Database(object):
             sub_category_id INTEGER NOT NULL, status_id INTEGER NOT NULL, \
             PRIMARY KEY (torrent_id), \
             FOREIGN KEY (category_id) REFERENCES categories(category_id), \
-            FOREIGN KEY (sub_category_id) \
-                REFERENCES sub_categories(sub_category_id), \
+            FOREIGN KEY (sub_category_id) REFERENCES sub_categories(sub_category_id), \
             FOREIGN KEY (status_id) REFERENCES status(status_id))')
+
+    '''
+    def myanimelist_create_database(self):
+        print('Creating database...')
+        self.c.execute('CREATE TABLE categories (category_id INTEGER NOT NULL, category_name TEXT NOT NULL, PRIMARY KEY (category_id))')
+        self.c.execute('CREATE TABLE sub_categories (sub_category_id INTEGER NOT NULL, sub_category_name TEXT NOT NULL, PRIMARY KEY (sub_category_id))')
+        self.c.execute('CREATE TABLE status (status_id INTEGER NOT NULL, status_name TEXT NOT NULL, PRIMARY KEY (status_id))')
+        self.c.execute('CREATE TABLE torrents \
+            (id INTEGER NOT NULL, title VARCHAR NOT NULL, \
+            synposis INTEGER NOT NULL, episodes INTEGER, \
+            aired VARCHAR NOT NULL, premiered VARCHAR, \
+            producers VARCHAR, licensors VARCHAR, \
+            studios VARCHAR, genres VARCHAR NOT NULL, \
+            duration VARCHAR, rating INTEGER, \
+            score INTEGER, ranked INTEGER NOT NULL, \
+            popularity INTEGER NOT NULL, members INTEGER NOT NULL, \
+            image_url VARCHAR NOT NULL, \
+            published INTEGER, category_id INTEGER NOT NULL, \
+            sub_category_id INTEGER NOT NULL, status_id INTEGER NOT NULL, \
+            PRIMARY KEY (id), \
+            FOREIGN KEY (category_id) REFERENCES categories(category_id), \
+            FOREIGN KEY (sub_category_id) REFERENCES sub_categories(sub_category_id), \
+            FOREIGN KEY (status_id) REFERENCES status(status_id))')
+    '''
 
     def check_categories(self):
         with open(self.path + '/categories.json') as f:
@@ -91,6 +101,8 @@ class Database(object):
                 category_json = json.load(f)['Nyaa']
             elif self.filename == 'bakabt.sqlite':
                 category_json = json.load(f)['Bakabt']
+            elif self.filename == 'myanimelist.sqlite':
+                category_json = json.load(f)['MyAnimeList']
         cur = self.c.cursor()
         cur.execute('SELECT * FROM categories')
         categories = cur.fetchall()
@@ -126,6 +138,8 @@ class Database(object):
             status = ['normal', 'remake', 'trusted', 'a+']
         elif self.filename == 'bakabt.sqlite':
             status = ['normal', 'A', 'B', 'C', 'D']
+        elif self.filename == 'myanimelist.sqlite':
+            status = ['Finished Airing', 'Currently Airing', 'Not yet aired', 'Unknown']
         db_status = cur.fetchall()
         if len(db_status) == 0:
             for i, stat in enumerate(status, start=1):
@@ -171,9 +185,9 @@ class Database(object):
         ]
         cur.execute('PRAGMA table_info(categories);')
         if cur.fetchall() == comparison:
-            print('Table \'categories\' verified.')
+            print('Table categories verified.')
         else:
-            exit('Table \'categories\' broken.')
+            exit('Table categories broken.')
 
         comparison = [
             (0, 'sub_category_id', 'INTEGER', 1, None, 1),
@@ -181,9 +195,9 @@ class Database(object):
         ]
         cur.execute('PRAGMA table_info(sub_categories);')
         if cur.fetchall() == comparison:
-            print('Table \'sub_categories\' verified.')
+            print('Table sub_categories verified.')
         else:
-            exit('Table \'sub_categories\' broken.')
+            exit('Table sub_categories broken.')
 
         comparison = [
             (0, 'status_id', 'INTEGER', 1, None, 1),
@@ -191,9 +205,9 @@ class Database(object):
         ]
         cur.execute('PRAGMA table_info(status);')
         if cur.fetchall() == comparison:
-            print('Table \'status\' verified.')
+            print('Table status verified.')
         else:
-            exit('Table \'status\' broken.')
+            exit('Table status broken.')
 
         comparison = [
             (0, 'torrent_id', 'INTEGER', 1, None, 1),
@@ -232,16 +246,14 @@ class Database(object):
         self.c.commit()
 
     def nyaa_update_torrent(self, data):
-        '''torrent_id, torrent_name, torrent_info, torrent_sld, torrent_magnet, category_id, sub_category_id, status_id'''
         self.c.execute('UPDATE torrents SET torrent_id=(?),torrent_name=(?),torrent_info=(?),torrent_sld=(?),torrent_magnet=(?),category_id=(?),sub_category_id=(?),status_id=(?) WHERE torrent_id='+str(data[0]), data)
         self.c.commit()
 
     def baka_write_torrent(self, data):
-        '''torrent_id, torrent_file torrent_url, torrent_name, torrent_resolution, torrent_tags, torrent_sb, torrent_cb, torrent_added, torrent_size, torrent_sld, category_id, sub_category_id, status_id'''
+        '''torrent_id, torrent_url, torrent_name, torrent_resolution, torrent_tags, torrent_sb, torrent_cb, torrent_added, torrent_size, torrent_sld, torrent_file, category_id, sub_category_id, status_id'''
         self.c.execute('INSERT INTO torrents VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
         self.c.commit()
 
     def baka_update_torrent(self, data):
-        '''torrent_id, torrent_name, torrent_info, torrent_sld, torrent_magnet, category_id, sub_category_id, status_id'''
         self.c.execute('UPDATE torrents SET torrent_id=(?),torrent_url=(?),torrent_name=(?),torrent_resolution=(?),torrent_tags=(?),torrent_sb=(?),torrent_cb=(?),torrent_added=(?),torrent_size=(?),torrent_sld=(?),torrent_file=(?),category_id=(?),sub_category_id=(?),status_id=(?) WHERE torrent_id='+str(data[0]), data)
         self.c.commit()
