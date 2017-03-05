@@ -10,14 +10,13 @@ Scrape [nyaa](http://nyaa.se), [sukebei](http://sukebei.nyaa.se), and [bakabt](h
 
 # USAGE
 - `Scraper.py nyaa|sukebei|bakabt new|missed|update`
-- `Scraper.py nyaa`
+- `Scraper.py nyaa update --start=100`
 
-The `new` mode starts from the last retrieved id in the database.<br>
-The `missed` mode rechecks for missed id not in the database.<br>
-The `update` mode updates existing id and inserts missing id; slower than `missed` mode.<br>
-<br>
+Mode `new` resumes from the last retrieved id in the database.<br>
+Mode `missed` mode rechecks for missed id not in the database.<br>
+Mode `update` updates existing id and inserts missing id; slower than `missed` mode.<br>
 Define start ID by appending the argument `--start=100`.<br>
 <br>
-The `categories.json` file defines allowed categories to be indexed in the sqlite database [modifying may corrupt existing databases].<br>
+Categories `categories.json` depicts categories to be indexed [modifying may corrupt existing databases].<br>
 <br>
-Modification of https://github.com/Hamuko/nyaamagnet which is no longer maintained.
+Modification of https://github.com/Hamuko/nyaamagnet
