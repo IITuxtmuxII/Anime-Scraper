@@ -11,7 +11,7 @@ def retry_on_fail(req, *args, **kwargs):
             delay = delay * 2 + 5
             print('Connection error, retrying in {} seconds... '
                   '(HTTP {})'.format(delay, r.status_code), file=sys.stderr)
-             if delay > 1800:
+            if delay > 1800:
                 print('Too many retry attempts.')
                 exit(code=1)
             time.sleep(delay)

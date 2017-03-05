@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from Database import Database
 from Config import load_settings
+import sys
 
-# TODO retrieve.py delay timeout
 # TODO try move variables for write_torrent into single variable
 # TODO Implement MyAnimeList.net
 
@@ -31,10 +31,10 @@ if config.db_name == 'bakabt':
                     status = be.status()
                     if config.mode == 'new' and not db.entry_exists(entry['baka_url_id']):
                         print('Insert: {}, Title: {}'.format(entry['baka_url_id'],entry['title']))
-                        db.baka_write_torrent((entry['baka_url_id'], entry['baka_url'], entry['title'], entry['resolution'], entry['tags'], entry['sb'], entry['cb'], entry['added'], entry['size'], entry['sld'], torrent, db.categories[entry['category']], db.sub_categories['Default'], db.status[status]))
+                        db.baka_write_torrent((entry['baka_url_id'], entry['baka_url'], entry['title'], entry['resolution'], entry['tags'], entry['sb'], entry['cb'], entry['added'], entry['size'], entry['sld'], torrent, i, db.categories[entry['category']], db.sub_categories['Default'], db.status[status]))
                     elif config.mode == 'update':
                         print('Update: {}, Title: {}'.format(entry['baka_url_id'],entry['title']))
-                        db.baka_update_torrent((entry['baka_url_id'], entry['baka_url'], entry['title'], entry['resolution'], entry['tags'], entry['sb'], entry['cb'], entry['added'], entry['size'], entry['sld'], torrent, db.categories[entry['category']], db.sub_categories['Default'], db.status[status]))
+                        db.baka_update_torrent((entry['baka_url_id'], entry['baka_url'], entry['title'], entry['resolution'], entry['tags'], entry['sb'], entry['cb'], entry['added'], entry['size'], entry['sld'], torrent, i, db.categories[entry['category']], db.sub_categories['Default'], db.status[status]))
                 else:
                     if not entry['category'] in db.categories:
                         print(entry['category'],'not in',db.categories)

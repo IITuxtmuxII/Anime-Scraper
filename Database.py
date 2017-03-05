@@ -36,6 +36,15 @@ class Database(object):
         except:
             return 0
 
+    @property
+    def last_page(self):
+        cur = self.c.cursor()
+        cur.execute('SELECT * FROM torrents ORDER BY torrent_page DESC LIMIT 1;')
+        try:
+            return cur.fetchone()[11]
+        except:
+            return 0
+
     def nyaa_create_database(self):
         print('Creating database...')
         self.c.execute('CREATE TABLE categories (category_id INTEGER NOT NULL, category_name TEXT NOT NULL, PRIMARY KEY (category_id))')
@@ -62,7 +71,8 @@ class Database(object):
             torrent_tags VARCHAR, torrent_sb VARCHAR, \
             torrent_cb VARCHAR NOT NULL, torrent_added VARCHAR NOT NULL, \
             torrent_size VARCHAR NOT NULL, torrent_sld VARCHAR NOT NULL, \
-            torrent_file BLOB NOT NULL, category_id INTEGER NOT NULL, \
+            torrent_file BLOB NOT NULL, torrent_page INTEGER NOT NULL, \
+            category_id INTEGER NOT NULL, \
             sub_category_id INTEGER NOT NULL, status_id INTEGER NOT NULL, \
             PRIMARY KEY (torrent_id), \
             FOREIGN KEY (category_id) REFERENCES categories(category_id), \
@@ -226,17 +236,17 @@ class Database(object):
             exit('Table torrents broken.')
 
     def write_category(self, data):
-        print('Writing category \'{}\' into database...'.format(data[1]))
+        print('Writing category {} into database...'.format(data[1]))
         self.c.execute('INSERT INTO categories VALUES (?, ?)', data)
         self.c.commit()
 
     def write_subcategory(self, data):
-        print('Writing subcategory \'{}\' into database...'.format(data[1]))
+        print('Writing subcategory {} into database...'.format(data[1]))
         self.c.execute('INSERT INTO sub_categories VALUES (?, ?)', data)
         self.c.commit()
 
     def write_status(self, data):
-        print('Writing status \'{}\' into database...'.format(data[1]))
+        print('Writing status {} into database...'.format(data[1]))
         self.c.execute('INSERT INTO status VALUES (?, ?)', data)
         self.c.commit()
 
@@ -250,10 +260,10 @@ class Database(object):
         self.c.commit()
 
     def baka_write_torrent(self, data):
-        '''torrent_id, torrent_url, torrent_name, torrent_resolution, torrent_tags, torrent_sb, torrent_cb, torrent_added, torrent_size, torrent_sld, torrent_file, category_id, sub_category_id, status_id'''
-        self.c.execute('INSERT INTO torrents VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
+        '''torrent_id, torrent_url, torrent_name, torrent_resolution, torrent_tags, torrent_sb, torrent_cb, torrent_added, torrent_size, torrent_sld, torrent_file, torrent_page, category_id, sub_category_id, status_id'''
+        self.c.execute('INSERT INTO torrents VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
         self.c.commit()
 
     def baka_update_torrent(self, data):
-        self.c.execute('UPDATE torrents SET torrent_id=(?),torrent_url=(?),torrent_name=(?),torrent_resolution=(?),torrent_tags=(?),torrent_sb=(?),torrent_cb=(?),torrent_added=(?),torrent_size=(?),torrent_sld=(?),torrent_file=(?),category_id=(?),sub_category_id=(?),status_id=(?) WHERE torrent_id='+str(data[0]), data)
+        self.c.execute('UPDATE torrents SET torrent_id=(?),torrent_url=(?),torrent_name=(?),torrent_resolution=(?),torrent_tags=(?),torrent_sb=(?),torrent_cb=(?),torrent_added=(?),torrent_size=(?),torrent_sld=(?),torrent_file=(?),torrent_page=(?),category_id=(?),sub_category_id=(?),status_id=(?) WHERE torrent_id='+str(data[0]), data)
         self.c.commit()

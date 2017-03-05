@@ -67,6 +67,9 @@ def load_settings():
         if config.mode == 'new' and config.start_entry is None:
             db = Database(config.db_dir, config.db_name)
             config.start_entry = db.last_entry + 1
+    elif config.db_name == 'bakabt':
+        db = Database(config.db_dir, config.db_name)
+        config.start_entry = db.last_page
     if config.start_entry is None:
         config.start_entry =  1
 
