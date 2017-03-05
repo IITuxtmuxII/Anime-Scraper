@@ -20,7 +20,7 @@ if config.db_name == 'bakabt':
                 if config.mode == 'missed' or config.mode == 'new' and db.entry_exists(entry['baka_url_id']):
                     if db.entry_exists(entry['baka_url_id']):
                         if config.mode == 'new':
-                            print('Already in database: {}, Title: {}'.format(entry['baka_url_id'],entry['title']))
+                            print('Exists: {}, Title: {}'.format(entry['baka_url_id'],entry['title']))
                         continue
                 be=BakaEntry(entry['baka_url'], entry['title_orig'])
                 torrent = be.torrent()
@@ -54,7 +54,7 @@ elif config.db_name == 'nyaa' or config.db_name == 'sukebei' or config.db_name =
         if config.mode == 'missed':
             if db.entry_exists(i):
                 if config.mode == 'new':
-                    print('ID exists: {}'.format(i))
+                    print('Exists: {}'.format(i))
                 continue
 
         if config.db_name == 'myanimelist':
@@ -72,15 +72,15 @@ elif config.db_name == 'nyaa' or config.db_name == 'sukebei' or config.db_name =
                     if config.db_name == 'nyaa' or config.db_name == 'sukebei':
                         db.nyaa_write_torrent((i, entry.name, str(entry.tag), str(entry.sld), entry.magnet, db.categories[entry.category], db.sub_categories[entry.sub_category], db.status[entry.status]))
                     elif config.db_name == 'myanimelist':
-                        print('not yet implemented!')
+                        print('to be implemented!')
                 elif config.mode == 'update':
                     print('Update: {}, Title: {}'.format(i, entry.name))
                     if config.db_name == 'nyaa' or config.db_name == 'sukebei':
                         db.nyaa_update_torrent((i, entry.name, entrytag, entrysld,  entry.magnet, db.categories[entry.category], db.sub_categories[entry.sub_category], db.status[entry.status]))
                     elif config.db_name == 'myanimelist':
-                        print('not yet implemented!')
+                        print('to be implemented!')
                 else:
-                    print('Exists: {} [To update set mode to update]'.format(i))
+                    print('Exists: {} [use update mode to update]'.format(i))
             else:
                 if not entry.category in db.categories:
                     print(entry.category,'not in',db.categories)
