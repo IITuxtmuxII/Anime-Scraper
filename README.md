@@ -12,10 +12,10 @@ Scrape [nyaa](http://nyaa.se), [sukebei](http://sukebei.nyaa.se), and [bakabt](h
 - `Scraper.py nyaa|sukebei|bakabt new|missed|update`
 - `Scraper.py nyaa update --start=100`
 
-Mode `new` resumes from the last retrieved id in the database.<br>
+Mode `new` (default) resumes from the last retrieved id in the database.<br>
 Mode `missed` mode rechecks for missed id not in the database.<br>
 Mode `update` updates existing id and inserts missing id; slower than `missed` mode.<br>
-Define start ID by appending the argument `--start=100`.<br>
+Argument `--start=100` define the id to start from.<br>
 <br>
 Categories `categories.json` depicts categories to be indexed [modifying may corrupt existing databases].<br>
 <br>
