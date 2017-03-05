@@ -1,7 +1,7 @@
 Anime Torrent Indexer
 ==========
 
-Scrape [nyaa](http://nyaa.se), [sukebei](http://sukebei.nyaa.se), and [bakabt](http://bakabt.me).
+Scrape [nyaa](http://nyaa.se), [sukebei](http://sukebei.nyaa.se), and [bakabt](http://bakabt.me) data into sqlite database.
 
 # REQUIREMENTS
 - [Python 3](https://www.python.org/download/releases/3.0/)
@@ -16,8 +16,8 @@ The `new` mode starts from the last retrieved id in the database.<br>
 The `missed` mode rechecks for missed id not in the database.<br>
 The `update` mode updates existing id and inserts missing id; slower than `missed` mode.<br>
 <br>
-Define starting ID with argument `--start=` followed by the ID number (not supported by `bakabt`). `Scraper.py nyaa --start=100`<br>
+Define start ID by appending the argument `--start=100`.<br>
 <br>
-The `categories.json` file defines the categories to be indexed in the sqlite database, remove categories to exclude them from being added to the database. This should not be modified if there are existing databases as it will change them, it should only be changed for new databases.<br>
+The `categories.json` file defines allowed categories to be indexed in the sqlite database [modifying may corrupt existing databases].<br>
 <br>
 Modification of https://github.com/Hamuko/nyaamagnet which is no longer maintained.
