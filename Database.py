@@ -204,7 +204,7 @@ class Database(object):
         if cur.fetchall() == comparison:
             print('Table categories verified.')
         else:
-            exit('Table categories broken.')
+            sys.exit('Table categories broken.')
 
         comparison = [
             (0, 'sub_category_id', 'INTEGER', 1, None, 1),
@@ -214,7 +214,7 @@ class Database(object):
         if cur.fetchall() == comparison:
             print('Table sub_categories verified.')
         else:
-            exit('Table sub_categories broken.')
+            sys.exit('Table sub_categories broken.')
 
         comparison = [
             (0, 'status_id', 'INTEGER', 1, None, 1),
@@ -240,7 +240,7 @@ class Database(object):
         if cur.fetchall() == comparison:
             print('Table torrents verified.')
         else:
-            exit('Table torrents broken.')
+            sys.exit('Table torrents broken.')
 
     def write_category(self, data):
         print('Writing category {} into database...'.format(data[1]))

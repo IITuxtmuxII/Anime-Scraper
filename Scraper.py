@@ -41,7 +41,7 @@ if config.db_name == 'bakabt':
                         db.baka_update_torrent((entry['baka_url_id'], entry['baka_url'], entry['title'], entry['resolution'], entry['tags'], entry['sb'], entry['cb'], entry['added'], entry['size'], entry['sld'], torrent, i, db.categories[entry['category']], db.sub_categories['Default'], db.status[status]))
                 else:
                     if not entry['category'] in db.categories:
-                        print(entry['category'], 'not in', db.categories)
+                        sys.exit(str(entry['category']) + ' not in ' + str(db.categories))
             else:
                 print('Error - {0} : {1}'.format(k, v))
 
@@ -92,9 +92,9 @@ elif config.db_name == 'nyaa' or config.db_name == 'sukebei' or config.db_name =
 
             else:
                 if not entry.category in db.categories:
-                    print(entry.category, 'not in', db.categories)
+                    sys.exit(str(entry.category) + ' not in ' + str(db.categories))
                 if not entry.sub_category in db.sub_categories:
-                    print(entry.sub_category, 'not in', db.sub_categories)
+                    sys.exit(str(entry.sub_category) + ' not in ' + str(db.sub_categories))
 
 db.c.close()
 print('Complete!')
