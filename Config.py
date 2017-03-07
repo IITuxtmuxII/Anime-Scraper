@@ -8,7 +8,13 @@ def load_settings():
     class Configuration(object):
 
         def __init__(self):
-            self.db_dir = os.path.dirname(os.path.realpath(__file__))
+            directory = str(os.path.dirname(os.path.realpath(__file__)))+'/sqlite'
+            try:
+                os.stat(directory)
+            except:
+                os.mkdir(directory)
+            self.db_dir = directory
+            print(self.db_dir)
             self.db_name = None
             self.mode = None
             self.site_url = None
@@ -53,24 +59,21 @@ def load_settings():
     except:
         config.mode = 'new'
 
-    try:
-        for opt in arguments:
-            if '--start=' in opt:
-                if int(opt.split('=')[1]):
-                    config.start_entry = int(opt.split('=')[1])
-                    print('> Start ID: {}'.format(config.start_entry))
-                else:
-                    print('Start ID input error, format --start=01')
+    for opt in arguments:
+        if '--start=' in opt:
+            if int(opt.split('=')[1]):
+                config.start_entry = int(opt.split('=')[1])
+                print('> Start ID: {}'.format(config.start_entry))
             else:
-                if config.db_name == 'nyaa' or config.db_name == 'sukebei' or config.db_name == 'myanimelist':
-                    if config.mode == 'new' and config.start_entry is None:
-                        db = Database(config.db_dir, config.db_name)
-                        config.start_entry = db.last_entry + 1
-                elif config.db_name == 'bakabt':
+                print('Start ID input error, format --start=01')
+        else:
+            if config.db_name == 'nyaa' or config.db_name == 'sukebei' or config.db_name == 'myanimelist':
+                if config.mode == 'new' and config.start_entry is None:
                     db = Database(config.db_dir, config.db_name)
-                    config.start_entry = db.last_page
-    except:
-        sys.exit('Error: Start ID logic error')
+                    config.start_entry = db.last_entry + 1
+            elif config.db_name == 'bakabt':
+                db = Database(config.db_dir, config.db_name)
+                config.start_entry = db.last_page
 
     if config.start_entry is None:
         config.start_entry = 1

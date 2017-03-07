@@ -19,4 +19,7 @@ Argument `--start=100` define the id to start from.<br>
 <br>
 Categories `categories.json` depict categories to be indexed [modifying may corrupt existing database].
 
+# FILES
+Data is saved into the `sqlite` folder as `*.sqlite` file.
+
 Note: myanimelist code uses a modified version of [mal_scraper](https://pypi.python.org/pypi/mal-scraper/0.1.0)
