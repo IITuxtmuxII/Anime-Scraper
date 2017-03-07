@@ -59,6 +59,21 @@ class Database(object):
             FOREIGN KEY (category_id) REFERENCES categories(category_id), \
             FOREIGN KEY (sub_category_id) REFERENCES sub_categories(sub_category_id), \
             FOREIGN KEY (status_id) REFERENCES status(status_id))')
+        self.c.execute('CREATE TABLE sub_categories (sub_category_id INTEGER NOT NULL, sub_category_name TEXT NOT NULL, PRIMARY KEY (sub_category_id))')
+        self.c.execute('CREATE TABLE status (status_id INTEGER NOT NULL, status_name TEXT NOT NULL, PRIMARY KEY (status_id))')
+        self.c.execute('CREATE TABLE torrents \
+            (torrent_id INTEGER NOT NULL, torrent_url VARCHAR NOT NULL, \
+            torrent_name VARCHAR, torrent_resolution VARCHAR, \
+            torrent_tags VARCHAR, torrent_sb VARCHAR, \
+            torrent_cb VARCHAR NOT NULL, torrent_added VARCHAR NOT NULL, \
+            torrent_size VARCHAR NOT NULL, torrent_sld VARCHAR NOT NULL, \
+            torrent_file BLOB NOT NULL, torrent_page INTEGER NOT NULL, \
+            category_id INTEGER NOT NULL, \
+            sub_category_id INTEGER NOT NULL, status_id INTEGER NOT NULL, \
+            PRIMARY KEY (torrent_id), \
+            FOREIGN KEY (category_id) REFERENCES categories(category_id), \
+            FOREIGN KEY (sub_category_id) REFERENCES sub_categories(sub_category_id), \
+            FOREIGN KEY (status_id) REFERENCES status(status_id))')
 
     def baka_create_database(self):
         print('Creating database...')
@@ -79,29 +94,21 @@ class Database(object):
             FOREIGN KEY (sub_category_id) REFERENCES sub_categories(sub_category_id), \
             FOREIGN KEY (status_id) REFERENCES status(status_id))')
 
-    '''
     def myanimelist_create_database(self):
         print('Creating database...')
         self.c.execute('CREATE TABLE categories (category_id INTEGER NOT NULL, category_name TEXT NOT NULL, PRIMARY KEY (category_id))')
         self.c.execute('CREATE TABLE sub_categories (sub_category_id INTEGER NOT NULL, sub_category_name TEXT NOT NULL, PRIMARY KEY (sub_category_id))')
         self.c.execute('CREATE TABLE status (status_id INTEGER NOT NULL, status_name TEXT NOT NULL, PRIMARY KEY (status_id))')
         self.c.execute('CREATE TABLE torrents \
-            (id INTEGER NOT NULL, title VARCHAR NOT NULL, \
-            synposis INTEGER NOT NULL, episodes INTEGER, \
-            aired VARCHAR NOT NULL, premiered VARCHAR, \
-            producers VARCHAR, licensors VARCHAR, \
-            studios VARCHAR, genres VARCHAR NOT NULL, \
-            duration VARCHAR, rating INTEGER, \
-            score INTEGER, ranked INTEGER NOT NULL, \
-            popularity INTEGER NOT NULL, members INTEGER NOT NULL, \
-            image_url VARCHAR NOT NULL, \
-            published INTEGER, category_id INTEGER NOT NULL, \
+            (torrent_id INTEGER NOT NULL, name VARCHAR NOT NULL, \
+            type VARCHAR NOT NULL, episodes VARCHAR NOT NULL, \
+            aired_start VARCHAR, aired_end VARCHAR, premiered VARCHAR, \
+            published INTEGER NOT NULL, category_id INTEGER NOT NULL, \
             sub_category_id INTEGER NOT NULL, status_id INTEGER NOT NULL, \
-            PRIMARY KEY (id), \
+            PRIMARY KEY (torrent_id), \
             FOREIGN KEY (category_id) REFERENCES categories(category_id), \
             FOREIGN KEY (sub_category_id) REFERENCES sub_categories(sub_category_id), \
             FOREIGN KEY (status_id) REFERENCES status(status_id))')
-    '''
 
     def check_categories(self):
         with open(self.path + '/categories.json') as f:
@@ -266,4 +273,12 @@ class Database(object):
 
     def baka_update_torrent(self, data):
         self.c.execute('UPDATE torrents SET torrent_id=(?),torrent_url=(?),torrent_name=(?),torrent_resolution=(?),torrent_tags=(?),torrent_sb=(?),torrent_cb=(?),torrent_added=(?),torrent_size=(?),torrent_sld=(?),torrent_file=(?),torrent_page=(?),category_id=(?),sub_category_id=(?),status_id=(?) WHERE torrent_id='+str(data[0]), data)
+        self.c.commit()
+
+    def myanimelist_write_torrent(self, data):
+        self.c.execute('INSERT INTO torrents VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
+        self.c.commit()
+
+    def myanimelist_update_torrent(self, data):
+        self.c.execute('UPDATE torrents SET torrent_id=(?),name=(?),type=(?),episodes=(?),aired_start=(?),aired_end=(?),premiered=(?),published=(?),category_id=(?),sub_category_id=(?),status_id=(?) WHERE torrent_id='+str(data[0]), data)
         self.c.commit()

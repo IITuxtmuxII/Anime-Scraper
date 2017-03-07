@@ -6,6 +6,7 @@ import os
 
 def load_settings():
     class Configuration(object):
+
         def __init__(self):
             self.db_dir = os.path.dirname(os.path.realpath(__file__))
             self.db_name = None
@@ -37,41 +38,26 @@ def load_settings():
             print('Invalid url.')
             exit(code=1)
 
-        try:
-            config.mode = 'new'
-            if args[1] == 'new':
-                config.mode = 'new'
-            elif args[1] == 'missed':
-                config.mode = 'missed'
-            elif args[1] == 'update':
-                config.mode = 'update'
-            else:
-                if '--start=' not in args[1]:
-                    print('Invalid option.')
-                    exit(code=1)
-        except:
-            config.mode = 'new'
-
     try:
-        for opt in arguments:
-            if '--start=' in opt:
-                if int(opt.split('=')[1]):
-                    config.start_entry = int(opt.split('=')[1])
-                    print('> Start ID: {}'.format(config.start_entry))
-                else:
-                    print('Start ID input error, format --start=01')
-            else:
-                if config.db_name == 'nyaa' or config.db_name == 'sukebei' or config.db_name == 'myanimelist':
-                    if config.mode == 'new' and config.start_entry is None:
-                        db = Database(config.db_dir, config.db_name)
-                        config.start_entry = db.last_entry + 1
-                elif config.db_name == 'bakabt':
-                    db = Database(config.db_dir, config.db_name)
-                    config.start_entry = db.last_page
+        config.mode = 'new'
+        if args[1] == 'new':
+            config.mode = 'new'
+        elif args[1] == 'missed':
+            config.mode = 'missed'
+        elif args[1] == 'update':
+            config.mode = 'update'
+        else:
+            if '--start=' not in args[1]:
+                print('Invalid option.')
+                exit(code=1)
     except:
-        exit('Error: Start ID logic error')
+        config.mode = 'new'
+
+    if config.mode == 'new' and config.start_entry is None:
+        db = Database(config.db_dir, config.db_name)
+        config.start_entry = db.last_entry + 1
 
     if config.start_entry is None:
-        config.start_entry =  1
+        config.start_entry = 1
 
     return config

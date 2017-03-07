@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 import requests
 import time
+import sys
 
 delay = 0
 def retry_on_fail(req, *args, **kwargs):
     global delay
     try:
-        r = req(*args, **kwargs, allow_redirects=True)
+        if "bakabt" not in args[0]:
+            r = req(*args, **kwargs, allow_redirects=True, headers = {'User-agent': 'test'})
+        else:
+            r = req(*args, **kwargs, allow_redirects=True)
+        if r.status_code == 404:
+            return None
         if r.status_code not in range(100, 399):
             delay = delay * 2 + 5
             print('Connection error, retrying in {} seconds... '

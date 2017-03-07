@@ -1,7 +1,7 @@
-Anime Torrent Indexer
+Anime Scraper
 ==========
 
-Scrape [nyaa](http://nyaa.se), [sukebei](http://sukebei.nyaa.se), and [bakabt](http://bakabt.me) data into sqlite database.
+Scrape [nyaa](http://nyaa.se), [sukebei](http://sukebei.nyaa.se), [bakabt](http://bakabt.me), and [myanimelist](https://myanimelist.net) data into sqlite database.
 
 # REQUIREMENTS
 - [Python 3](https://www.python.org/download/releases/3.0/)
@@ -9,7 +9,7 @@ Scrape [nyaa](http://nyaa.se), [sukebei](http://sukebei.nyaa.se), and [bakabt](h
 - [Requests](http://docs.python-requests.org/en/latest/)
 
 # USAGE
-- `Scraper.py nyaa|sukebei|bakabt new|missed|update`
+- `Scraper.py nyaa|sukebei|bakabt|myanimelist new|missed|update`
 - `Scraper.py nyaa update --start=100`
 
 Mode `new` (default) resume from the last retrieved id in the database.<br>
@@ -17,6 +17,6 @@ Mode `missed` mode recheck missed id not in the database.<br>
 Mode `update` update existing id, insert missed id; slower than `missed` mode.<br>
 Argument `--start=100` define the id to start from.<br>
 <br>
-Categories `categories.json` depict categories to be indexed [modifying may corrupt existing database].<br>
-<br>
-Modification of https://github.com/Hamuko/nyaamagnet
+Categories `categories.json` depict categories to be indexed [modifying may corrupt existing database].
+
+Note: myanimelist code uses a modified version of [mal_scraper](https://pypi.python.org/pypi/mal-scraper/0.1.0)
