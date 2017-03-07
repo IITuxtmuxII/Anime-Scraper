@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 
 from Retrieve import retry_on_fail
 import requests
+import re
 
 from .consts import AiringStatus, Format
 from .exceptions import MissingTagError, ParseError
@@ -134,10 +135,10 @@ def _get_japanese_name(soup):
 
 def _get_format(soup):
     pretag = soup.find('span', string='Type:')
-    if not pretag:
-        raise MissingTagError('type')
-
-    return pretag.find_next('a').string.strip()
+    the_type = pretag.find_next('a').string.strip()
+    if the_type not in ['TV','OVA','ONA','Special','Movie']: # cannot return None
+        return 'TV'
+    return the_type
 
 
 def _get_episodes(soup):
@@ -184,10 +185,16 @@ def _get_start_date(soup):
     start_text = aired_text.split(' to ')[0]
 
     try:
-        start_date = _get_date(start_text)
-    except ValueError:  # pragma: no cover
-        raise ParseError('airing start date', 'Cannot process text "%s"' % start_text)
-    return start_date
+        #print(start_text.index(','))
+        if re.match("^[A-Za-z0-9_-]*$", start_text.split(',')[0]):
+            return None
+        elif int(start_text.split(',')[0]):
+            start_date = _get_date("Apr 1, " + str(start_text))
+        else:
+            start_date = _get_date(start_text)
+        return start_date
+    except ValueError as e:
+        return None
 
 
 def _get_end_date(soup):
@@ -195,21 +202,21 @@ def _get_end_date(soup):
     if not pretag:
         raise MissingTagError('aired')
 
-    aired_text = pretag.next_sibling.strip()
-    if ' to ' in aired_text:
-        end_text = aired_text.split(' to ')[1]
-    else:
-        end_text = aired_text
-
-    if end_text == '?':
-        return None
-
     try:
-        end_date = _get_date(end_text)
-    except ValueError:  # pragma: no cover
-        # MAL probably changed their website
-        raise ParseError('airing end date', 'Cannot process text "%s"' % end_text)
-    return end_date
+        aired_text = pretag.next_sibling.strip()
+        if ' to ' in aired_text:
+            end_text = aired_text.split(' to ')[1]
+            if end_text == '?':
+                return None
+            try:
+                end_date = _get_date(end_text)
+            except ValueError:  # pragma: no cover
+                # MAL probably changed their website
+                raise ParseError('airing end date', 'Cannot process text "%s"' % end_text)
+            return end_date
+    except ValueError as e:
+        return None
+    return None
 
 def _get_date(date_text):
     return eval("get_date('"+date_text+"')")
