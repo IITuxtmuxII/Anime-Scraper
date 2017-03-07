@@ -53,9 +53,24 @@ def load_settings():
     except:
         config.mode = 'new'
 
-    if config.mode == 'new' and config.start_entry is None:
-        db = Database(config.db_dir, config.db_name)
-        config.start_entry = db.last_entry + 1
+    try:
+        for opt in arguments:
+            if '--start=' in opt:
+                if int(opt.split('=')[1]):
+                    config.start_entry = int(opt.split('=')[1])
+                    print('> Start ID: {}'.format(config.start_entry))
+                else:
+                    print('Start ID input error, format --start=01')
+            else:
+                if config.db_name == 'nyaa' or config.db_name == 'sukebei' or config.db_name == 'myanimelist':
+                    if config.mode == 'new' and config.start_entry is None:
+                        db = Database(config.db_dir, config.db_name)
+                        config.start_entry = db.last_entry + 1
+                elif config.db_name == 'bakabt':
+                    db = Database(config.db_dir, config.db_name)
+                    config.start_entry = db.last_page
+    except:
+        sys.exit('Error: Start ID logic error')
 
     if config.start_entry is None:
         config.start_entry = 1
