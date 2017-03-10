@@ -14,7 +14,7 @@ def load_settings():
             except:
                 os.mkdir(directory)
             self.db_dir = directory
-            print(self.db_dir)
+            #print(self.db_dir)
             self.db_name = None
             self.mode = None
             self.site_url = None
