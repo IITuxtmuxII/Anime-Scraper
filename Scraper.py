@@ -55,7 +55,7 @@ elif config.db_name == 'nyaa' or config.db_name == 'sukebei' or config.db_name =
         nt = Nyaa(config.site_url)
 
     for i in range(config.start_entry, nt.last_entry + 1):
-        if config.mode == 'missed':
+        if config.mode == 'missed' or config.mode == 'new':
             if db.entry_exists(i):
                 if config.mode == 'new':
                     print('Exists: {}'.format(i))
@@ -83,10 +83,10 @@ elif config.db_name == 'nyaa' or config.db_name == 'sukebei' or config.db_name =
                 elif config.db_name == 'myanimelist':
                     if config.mode == 'new' and not db.entry_exists(i):
                         print('Insert: {}, Title: {}'.format(i, entry.name))
-                        db.myanimelist_write_torrent((i, entry.name, entry.type, entry.episodes, entry.aired_start, entry.aired_end, str(entry.premiered), entry.published, db.categories[entry.category], db.sub_categories[entry.sub_category], db.status[entry.status]))
+                        db.myanimelist_write_torrent((i, entry.name, entry.type, entry.episodes, entry.aired_start, entry.aired_end, str(entry.premiered), entry.rating, entry.published, db.categories[entry.category], db.sub_categories[entry.sub_category], db.status[entry.status]))
                     elif config.mode == 'update':
                         print('Update: {}, Title: {}'.format(i, entry.name))
-                        db.myanimelist_update_torrent((i, entry.name, entry.type, entry.episodes, entry.aired_start, entry.aired_end, str(entry.premiered), entry.published, db.categories[entry.category], db.sub_categories[entry.sub_category], db.status[entry.status]))
+                        db.myanimelist_update_torrent((i, entry.name, entry.type, entry.episodes, entry.aired_start, entry.aired_end, str(entry.premiered), entry.rating, entry.published, db.categories[entry.category], db.sub_categories[entry.sub_category], db.status[entry.status]))
                     else:
                         print('Exists: {} [use update mode to update]'.format(i))
 

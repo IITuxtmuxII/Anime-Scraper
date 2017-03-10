@@ -102,7 +102,8 @@ class Database(object):
         self.c.execute('CREATE TABLE torrents \
             (torrent_id INTEGER NOT NULL, name VARCHAR NOT NULL, \
             type VARCHAR NOT NULL, episodes VARCHAR NOT NULL, \
-            aired_start VARCHAR, aired_end VARCHAR, premiered VARCHAR, \
+            aired_start VARCHAR, aired_end VARCHAR, \
+            premiered VARCHAR, rating VARCHAR, \
             published INTEGER NOT NULL, category_id INTEGER NOT NULL, \
             sub_category_id INTEGER NOT NULL, status_id INTEGER NOT NULL, \
             PRIMARY KEY (torrent_id), \
@@ -276,9 +277,9 @@ class Database(object):
         self.c.commit()
 
     def myanimelist_write_torrent(self, data):
-        self.c.execute('INSERT INTO torrents VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
+        self.c.execute('INSERT INTO torrents VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
         self.c.commit()
 
     def myanimelist_update_torrent(self, data):
-        self.c.execute('UPDATE torrents SET torrent_id=(?),name=(?),type=(?),episodes=(?),aired_start=(?),aired_end=(?),premiered=(?),published=(?),category_id=(?),sub_category_id=(?),status_id=(?) WHERE torrent_id='+str(data[0]), data)
+        self.c.execute('UPDATE torrents SET torrent_id=(?),name=(?),type=(?),episodes=(?),aired_start=(?),aired_end=(?),premiered=(?),rating=(?),published=(?),category_id=(?),sub_category_id=(?),status_id=(?) WHERE torrent_id='+str(data[0]), data)
         self.c.commit()

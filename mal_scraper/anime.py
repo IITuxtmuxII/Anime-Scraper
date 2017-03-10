@@ -14,11 +14,6 @@ from .requester import request_passthrough
 
 logger = logging.getLogger(__name__)
 
-# Future interface?
-# def retrieve_iterative(id_refs, concurrency=10, requester='request_limiter'):
-#     # id_refs = int or Iterable[int]
-#     pass
-
 
 def retrieve_anime(id_ref=1, requester=request_passthrough):
     """Return the metadata for a particular show.
@@ -83,6 +78,7 @@ def _process_soup(soup):
         'airing_started': _get_start_date,
         'airing_finished': _get_end_date,
         'airing_premiere': _get_airing_premiere,
+        'rating': _get_rating,
     }
 
     retrieved = {}
@@ -132,6 +128,14 @@ def _get_japanese_name(soup):
     text = pretag.next_sibling.strip()
     return text
 
+def _get_rating(soup):
+    pretag = soup.find('span', string='Rating:')
+    if not pretag:
+        return None
+        raise MissingTagError('rating')
+
+    text = pretag.next_sibling.strip()
+    return text
 
 def _get_format(soup):
     pretag = soup.find('span', string='Type:')
@@ -152,8 +156,7 @@ def _get_episodes(soup):
 
     try:
         episodes_number = int(episodes_text)
-    except (ValueError, TypeError):  # pragma: no cover
-        # MAL probably changed the webpage
+    except (ValueError, TypeError):
         raise ParseError('episodes', 'Unable to convert text "%s" to int' % episodes_text)
 
     return episodes_number
@@ -168,13 +171,16 @@ def _get_airing_status(soup):
     status = {
         'finished airing': 'Finished Airing',
         'currently airing': 'Currently Airing',
+        'not yet aired': 'Not yet aired',
     }.get(status_text, None)
 
-    if not status:  # pragma: no cover
+    if not status:
         raise ParseError('status', 'Unable to identify text "%s"' % status_text)
 
     return status
 
+def only_letters(string):
+    return all(letter.isalpha() for letter in string)
 
 def _get_start_date(soup):
     pretag = soup.find('span', string='Aired:')
@@ -182,13 +188,14 @@ def _get_start_date(soup):
         raise MissingTagError('aired')
 
     aired_text = pretag.next_sibling.strip()
+    if aired_text == 'Not available':
+        return None
     start_text = aired_text.split(' to ')[0]
 
     try:
-        #print(start_text.index(','))
-        if re.match("^[A-Za-z0-9_-]*$", start_text.split(',')[0]):
-            return None
-        elif int(start_text.split(',')[0]):
+        if only_letters(start_text.split(',')[0]):
+            start_date = _get_date(start_text.split(',')[0]+' 1,'+start_text.split(',')[1])
+        elif start_text.split(',')[0].isdigit():
             start_date = _get_date("Apr 1, " + str(start_text))
         else:
             start_date = _get_date(start_text)
@@ -210,9 +217,9 @@ def _get_end_date(soup):
                 return None
             try:
                 end_date = _get_date(end_text)
-            except ValueError:  # pragma: no cover
-                # MAL probably changed their website
-                raise ParseError('airing end date', 'Cannot process text "%s"' % end_text)
+            except ValueError:
+                return None
+                #raise ParseError('airing end date', 'Cannot process text "%s"' % end_text)
             return end_date
     except ValueError as e:
         return None
@@ -228,17 +235,39 @@ def _get_airing_premiere(soup):
         return None
         #raise MissingTagError('premiered')
 
-    season, year = pretag.find_next('a').string.lower().split(' ')
-    if season == 'fall':
-        season = 'autumn'
-    elif season not in ('spring', 'summer', 'autumn', 'winter'):  # pragma: no cover
-        # MAL probably changed their website
-        raise ParseError('premiered', 'Unable to identify season "%s"' % season)
+    text = pretag.next_sibling.strip()
+    if '?' in text:
+        return None
 
-    try:
-        year = int(year)
-    except (ValueError, TypeError):  # pragma: no cover
-        # MAL probably changed their website
-        raise ParseError('premiered', 'Unable to identify year "%s"' % year)
+    if 'add some' in str(pretag.find_next('a')):
+        return None
 
-    return (year, season)
+    Months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    month=0
+    for i in Months:
+        if i in str(pretag.find_next('a')):
+            month=1
+            break
+
+    if month==1:
+        try:
+            season, year = pretag.find_next('a').string.lower().split(' ')
+            if season == 'fall':
+                season = 'autumn'
+            elif season not in ('spring', 'summer', 'autumn', 'winter'):
+                print('unknown season', pretag.find_next('a'))
+                return None
+                #raise ParseError('premiered', 'Unable to identify season "%s"' % season)
+
+            try:
+                year = int(year)
+            except (ValueError, TypeError):
+                print('unknown year', pretag.find_next('a'))
+                return None
+                #raise ParseError('premiered', 'Unable to identify year "%s"' % year)
+
+            return (year, season)
+        except:
+            return None
+    else:
+        return None
