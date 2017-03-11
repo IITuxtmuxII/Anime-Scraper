@@ -57,8 +57,7 @@ elif config.db_name == 'nyaa' or config.db_name == 'sukebei' or config.db_name =
     for i in range(config.start_entry, nt.last_entry + 1):
         if config.mode == 'missed' or config.mode == 'new':
             if db.entry_exists(i):
-                if config.mode == 'new':
-                    print('Exists: {}'.format(i))
+                print('Exists: {}'.format(i))
                 continue
 
         if config.db_name == 'myanimelist':
