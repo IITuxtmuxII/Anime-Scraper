@@ -2,4 +2,3 @@ __pycache__/
 magnet/
 *.sqlite
 *.sqlite-journal
-MyAnimeList.py
