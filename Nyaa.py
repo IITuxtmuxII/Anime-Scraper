@@ -50,6 +50,11 @@ class NyaaEntry(object):
         return self.page.find('td', class_='viewtorrentname').text
 
     @property
+    def size(self):
+        filesize = self.page.find('td', class_='tname', string='File size:').next_sibling.text.strip()
+        return filesize
+
+    @property
     def time(self):
         return self.page.find('td', class_='vtop').text.split(', ')
 

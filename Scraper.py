@@ -73,10 +73,10 @@ elif config.db_name == 'nyaa' or config.db_name == 'sukebei' or config.db_name =
                         continue
                     if config.mode == 'new' and not db.entry_exists(i):
                         print('Insert: {}, Title: {}'.format(i, entry.name))
-                        db.nyaa_write_torrent((i, entry.name, str(entry.tag), str(entry.sld), entry.magnet, db.categories[entry.category], db.sub_categories[entry.sub_category], db.status[entry.status]))
+                        db.nyaa_write_torrent((i, entry.name, str(entry.tag), str(entry.size), str(entry.sld), entry.magnet, db.categories[entry.category], db.sub_categories[entry.sub_category], db.status[entry.status]))
                     elif config.mode == 'update':
                         print('Update: {}, Title: {}'.format(i, entry.name))
-                        db.nyaa_update_torrent((i, entry.name, entrytag, entrysld,  entry.magnet, db.categories[entry.category], db.sub_categories[entry.sub_category], db.status[entry.status]))
+                        db.nyaa_update_torrent((i, entry.name, str(entry.tag), str(entry.size), str(entry.sld), entry.magnet, db.categories[entry.category], db.sub_categories[entry.sub_category], db.status[entry.status]))
                     else:
                         print('Exists: {} [use update mode to update]'.format(i))
                 elif config.db_name == 'myanimelist':
@@ -87,7 +87,7 @@ elif config.db_name == 'nyaa' or config.db_name == 'sukebei' or config.db_name =
                         print('Update: {}, Title: {}'.format(i, entry.name))
                         db.myanimelist_update_torrent((i, entry.name, entry.type, entry.episodes, entry.aired_start, entry.aired_end, str(entry.premiered), entry.rating, entry.published, db.categories[entry.category], db.sub_categories[entry.sub_category], db.status[entry.status]))
                     else:
-                        print('Exists: {} [use update mode to update]'.format(i))
+                        print('Exists: {} [use update mode]'.format(i))
 
             else:
                 if not entry.category in db.categories:

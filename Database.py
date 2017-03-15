@@ -52,23 +52,9 @@ class Database(object):
         self.c.execute('CREATE TABLE status (status_id INTEGER NOT NULL, status_name TEXT NOT NULL, PRIMARY KEY (status_id))')
         self.c.execute('CREATE TABLE torrents \
             (torrent_id INTEGER NOT NULL, torrent_name VARCHAR NOT NULL, \
-            torrent_info VARCHAR NOT NULL, torrent_sld VARCHAR NOT NULL, \
+            torrent_info VARCHAR NOT NULL, torrent_size VARCHAR, \
+            torrent_sld VARCHAR NOT NULL, \
             torrent_magnet VARCHAR NOT NULL, category_id INTEGER NOT NULL, \
-            sub_category_id INTEGER NOT NULL, status_id INTEGER NOT NULL, \
-            PRIMARY KEY (torrent_id), \
-            FOREIGN KEY (category_id) REFERENCES categories(category_id), \
-            FOREIGN KEY (sub_category_id) REFERENCES sub_categories(sub_category_id), \
-            FOREIGN KEY (status_id) REFERENCES status(status_id))')
-        self.c.execute('CREATE TABLE sub_categories (sub_category_id INTEGER NOT NULL, sub_category_name TEXT NOT NULL, PRIMARY KEY (sub_category_id))')
-        self.c.execute('CREATE TABLE status (status_id INTEGER NOT NULL, status_name TEXT NOT NULL, PRIMARY KEY (status_id))')
-        self.c.execute('CREATE TABLE torrents \
-            (torrent_id INTEGER NOT NULL, torrent_url VARCHAR NOT NULL, \
-            torrent_name VARCHAR, torrent_resolution VARCHAR, \
-            torrent_tags VARCHAR, torrent_sb VARCHAR, \
-            torrent_cb VARCHAR NOT NULL, torrent_added VARCHAR NOT NULL, \
-            torrent_size VARCHAR NOT NULL, torrent_sld VARCHAR NOT NULL, \
-            torrent_file BLOB NOT NULL, torrent_page INTEGER NOT NULL, \
-            category_id INTEGER NOT NULL, \
             sub_category_id INTEGER NOT NULL, status_id INTEGER NOT NULL, \
             PRIMARY KEY (torrent_id), \
             FOREIGN KEY (category_id) REFERENCES categories(category_id), \
@@ -231,11 +217,12 @@ class Database(object):
             (0, 'torrent_id', 'INTEGER', 1, None, 1),
             (1, 'torrent_name', 'VARCHAR', 1, None, 0),
             (2, 'torrent_info', 'VARCHAR', 1, None, 0),
-            (3, 'torrent_sld', 'VARCHAR', 1, None, 0),
-            (4, 'torrent_magnet', 'VARCHAR', 1, None, 0),
-            (5, 'category_id', 'INTEGER', 1, None, 0),
-            (6, 'sub_category_id', 'INTEGER', 1, None, 0),
-            (7, 'status_id', 'INTEGER', 1, None, 0)
+            (3, 'torrent_size', 'VARCHAR', 0, None, 0),
+            (4, 'torrent_sld', 'VARCHAR', 1, None, 0),
+            (5, 'torrent_magnet', 'VARCHAR', 1, None, 0),
+            (6, 'category_id', 'INTEGER', 1, None, 0),
+            (7, 'sub_category_id', 'INTEGER', 1, None, 0),
+            (8, 'status_id', 'INTEGER', 1, None, 0)
         ]
         cur.execute('PRAGMA table_info(torrents);')
         if cur.fetchall() == comparison:
@@ -260,11 +247,11 @@ class Database(object):
 
     def nyaa_write_torrent(self, data):
         '''torrent_id, torrent_name, torrent_info, torrent_sld, torrent_magnet, category_id, sub_category_id, status_id'''
-        self.c.execute('INSERT INTO torrents VALUES (?, ?, ?, ?, ?, ?, ?, ?)', data)
+        self.c.execute('INSERT INTO torrents VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
         self.c.commit()
 
     def nyaa_update_torrent(self, data):
-        self.c.execute('UPDATE torrents SET torrent_id=(?),torrent_name=(?),torrent_info=(?),torrent_sld=(?),torrent_magnet=(?),category_id=(?),sub_category_id=(?),status_id=(?) WHERE torrent_id='+str(data[0]), data)
+        self.c.execute('UPDATE torrents SET torrent_id=(?),torrent_name=(?),torrent_info=(?),torrent_size=(?),torrent_sld=(?),torrent_magnet=(?),category_id=(?),sub_category_id=(?),status_id=(?) WHERE torrent_id='+str(data[0]), data)
         self.c.commit()
 
     def baka_write_torrent(self, data):
